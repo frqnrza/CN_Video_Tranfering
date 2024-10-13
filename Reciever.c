@@ -40,11 +40,19 @@ int main() {
     while (1) {
         ssize_t bytes_received = recv(client_sock, buffer, BUFFER_SIZE, 0);
         if (bytes_received > 0) {
-            // Check for EOF signal
-            if (strncmp(buffer, "EOF", 3) == 0) {
+            // Check for EOF signal at the last 3 bytes
+            if (bytes_received == 3 && strncmp(buffer, "EOF", 3) == 0) {
                 break;
             }
             fwrite(buffer, 1, bytes_received, file);
+        }
+        else if (bytes_received == 0) {
+            // End of transmission
+            break;
+        }
+        else {
+            perror("Failed to receive data");
+            exit(1);
         }
     }
 
